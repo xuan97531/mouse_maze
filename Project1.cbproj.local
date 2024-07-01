@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2021/10/17 19:07:49.000.078,=C:\Users\kitty\Documents\Embarcadero\Studio\Projects\Project1PCH1.h</Transaction>
+    <Transaction>2021/10/17 19:07:49.000.380,=C:\Users\kitty\Documents\Embarcadero\Studio\Projects\Unit1.cpp</Transaction>
+    <Transaction>2021/11/21 20:08:40.000.351,=C:\Users\kitty\Documents\Embarcadero\Studio\Projects\Project1PCH1.h</Transaction>
+    <Transaction>2021/11/21 20:08:40.000.692,=C:\Users\kitty\Documents\Embarcadero\Studio\Projects\Unit1.cpp</Transaction>
+    <Transaction>2021/11/21 20:11:00.000.318,C:\Users\kitty\Documents\Embarcadero\Studio\HW4_09360423_蔣亞軒\Unit1.cpp=C:\Users\kitty\Documents\Embarcadero\Studio\Projects\Unit1.cpp</Transaction>
+    <Transaction>2021/11/21 20:11:00.000.318,C:\Users\kitty\Documents\Embarcadero\Studio\HW4_09360423_蔣亞軒\Unit1.h=C:\Users\kitty\Documents\Embarcadero\Studio\Projects\Unit1.h</Transaction>
+    <Transaction>2021/11/21 20:11:00.000.318,C:\Users\kitty\Documents\Embarcadero\Studio\HW4_09360423_蔣亞軒\Unit1.dfm=C:\Users\kitty\Documents\Embarcadero\Studio\Projects\Unit1.dfm</Transaction>
+    <Transaction>2021/11/21 20:11:03.000.859,C:\Users\kitty\Documents\Embarcadero\Studio\HW4_09360423_蔣亞軒\Project1PCH1.h=C:\Users\kitty\Documents\Embarcadero\Studio\Projects\Project1PCH1.h</Transaction>
+    <Transaction>2021/11/21 20:11:05.000.586,C:\Users\kitty\Documents\Embarcadero\Studio\HW4_09360423_蔣亞軒\Project1.cbproj=C:\Users\kitty\Documents\Embarcadero\Studio\Projects\Project1.cbproj</Transaction>
+  </Transactions>
+</BorlandProject>

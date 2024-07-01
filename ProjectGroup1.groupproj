@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{9F95E3B9-20FF-4254-A489-4A86066759DC}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="..\..\..\..\Desktop\11^27\11^27\MouseInMaze by 09360733.cbproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Project1.cbproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="MouseInMaze by 09360733">
+        <MSBuild Projects="..\..\..\..\Desktop\11^27\11^27\MouseInMaze by 09360733.cbproj"/>
+    </Target>
+    <Target Name="MouseInMaze by 09360733:Clean">
+        <MSBuild Projects="..\..\..\..\Desktop\11^27\11^27\MouseInMaze by 09360733.cbproj" Targets="Clean"/>
+    </Target>
+    <Target Name="MouseInMaze by 09360733:Make">
+        <MSBuild Projects="..\..\..\..\Desktop\11^27\11^27\MouseInMaze by 09360733.cbproj" Targets="Make"/>
+    </Target>
+    <Target Name="Project1">
+        <MSBuild Projects="Project1.cbproj"/>
+    </Target>
+    <Target Name="Project1:Clean">
+        <MSBuild Projects="Project1.cbproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Project1:Make">
+        <MSBuild Projects="Project1.cbproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="MouseInMaze by 09360733;Project1"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="MouseInMaze by 09360733:Clean;Project1:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="MouseInMaze by 09360733:Make;Project1:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

@@ -1,0 +1,339 @@
+//---------------------------------------------------------------------------
+
+#include <vcl.h>
+#pragma hdrstop
+
+#include "Unit1.h"
+//---------------------------------------------------------------------------
+#pragma package(smart_init)
+#pragma resource "*.dfm"
+
+#define possible_direction 8
+#define S 4
+TForm1 *Form1;
+
+int m,n,x,y,top=-1,d,i,j;
+int starti=1,startj=0,endi,endj,success;
+int maze[200][200];
+int mark[200][200];
+int B[200][200];
+int **A;
+int **w;
+
+struct position*Stack;
+
+struct offset{
+	int dx,dy;
+};
+//enum directions {N,NE,E,SE,S,SW,W,NW};
+struct offset move[possible_direction];
+struct position{
+	 int x,y;
+	 int dir;
+};
+struct cood{
+	 int dx,dy;
+};
+struct position step ,next,stack[200];
+struct cood f1[S];
+struct cood f2[S];
+
+
+
+//---------------------------------------------------------------------------
+__fastcall TForm1::TForm1(TComponent* Owner)
+	: TForm(Owner)
+{
+	 Memo1->Clear();
+	 move[0].dx = -1; move[0].dy = 0;
+	 move[1].dx = -1; move[1].dy = 1;
+	 move[2].dx = 0 ; move[2].dy = 1;
+	 move[3].dx = 1 ; move[3].dy = 1;
+	 move[4].dx = 1 ; move[4].dy = 0;
+	 move[5].dx = 1 ; move[5].dy = -1;
+	 move[6].dx = 0 ; move[6].dy = -1;
+	 move[7].dx = -1; move[7].dy =  1;
+}
+//---------------------------------------------------------------------------
+
+void push(struct position data){
+	 if(top==(m*n-1));
+	 else{
+		Stack[++top] = data;
+	 }
+	 int d = data.dir;
+	 Form1->Memo3->Lines->Add("push -> " + IntToStr(data.x) + "," + IntToStr(data.y) + " dir -> " + d + " top -> " + top);
+}
+struct position pop(){
+	 if(top==-1);
+	 else{
+		Form1->Memo3->Lines->Add("push -> " + IntToStr(Stack[top].x) + "," + IntToStr(Stack[top].y) + " dir -> " + IntToStr(Stack[top].dir) + " top -> " + top);
+		return Stack[top--];
+	 }
+}
+
+void initation(){
+	 f1[0].dx = 0; f1[0].dy = 1;
+	 f1[1].dx =-1; f1[1].dy = 0;
+	 f1[2].dx = 0; f1[2].dy =-1;
+	 f1[3].dx = 1; f1[3].dy = 0;
+	 f2[0].dx = 0; f2[0].dy = 2;
+	 f2[1].dx =-2; f2[1].dy = 0;
+	 f2[2].dx = 0; f2[2].dy =-2;
+	 f2[3].dx = 2; f2[3].dy = 0;
+
+	 for(i=0;i<S;i++)
+		 for(j=0;j<S;j++) w[i][j] = 1;
+}
+
+int NextMove(struct position step){
+	for(i=0;i<S;i++)
+		if(w[step.x+f2[i].dx][step.y+f2[i].dy]==1) return 1;
+	return 0;
+}
+
+
+int visit(int i,int j){
+	 mark[i][j]=3;
+	 if(i==(endi-1)&&j==(endj-1)) success=1;
+	 if(success!=1&&mark[i][j+1]==0) visit(i,j+1);
+	 if(success!=1&&mark[i+1][j]==0) visit(i+1,j);
+	 if(success!=1&&mark[i][j-1]==0) visit(i,j-1);
+	 if(success!=1&&mark[i-1][j]==0) visit(i-1,j);
+	 if(success!=1) mark[i][j]==3;
+	 return success;
+}
+
+int **generatemaze(int ** A,int x,int y){
+	 int direction;
+	 A[x][y]=0;
+	 while(A[x][y+2]==1 || A[x+2][y]==1 || A[x][y-2]==1 || A[x-2][y]==1){
+		  direction = rand()%4;
+		  if(direction==0 && A[x][y+2]==1){
+			 A[x][y+1] = 0;
+			 Form1->Memo3->Lines->Add("(x,y,dir)= "+IntToStr(x) + "," +IntToStr(y) + "," + IntToStr(direction));
+			 A = generatemaze(A,x,y+2);
+		  }
+		  else if(direction==1 && A[x-2][y]==1){
+			 A[x-1][y] = 0;
+			 Form1->Memo3->Lines->Add("(x,y,dir)= "+IntToStr(x) + "," +IntToStr(y) + "," + IntToStr(direction));
+			 A = generatemaze(A,x-2,y);
+		  }
+		  else if(direction==2 && A[x][y-2]==1){
+			 A[x][y-1] = 0;
+			 Form1->Memo3->Lines->Add("(x,y,dir)= "+IntToStr(x) + "," +IntToStr(y) + "," + IntToStr(direction));
+			 A = generatemaze(A,x,y-2);
+		  }
+		  else if(direction==3 && A[x+2][y]==1){
+			 A[x+1][y] = 0;
+			 Form1->Memo3->Lines->Add("(x,y,dir)= "+IntToStr(x) + "," +IntToStr(y) + "," + IntToStr(direction));
+			 A = generatemaze(A,x+2,y);
+		  }
+	 }
+	 return A;
+}
+
+void __fastcall TForm1::Button1Click(TObject *Sender)
+{
+	 /*int MaxInt,i,j;
+	 m = StrToInt(Edit1->Text);
+	 n = StrToInt(Edit2->Text);
+
+	 for(i=1;i<=m;i++){
+		for(j=1;j<=n;j++){
+			B[i][j] = rand()%2;
+			B[j][i] = B[i][j];
+		}
+		B[i][j] = MaxInt;
+	 }
+	 for(i=0;i<m+2;i++)
+		 for(j=0;j<n+2;j++){
+			 if(j==0||j==n+1) B[i][j]=2;
+			 if(i==0||i==m+1) B[i][j]=2;
+			 if((i==1&&(j==0||j==1))||(i==m&&(j==n||j==n+1))) B[i][j]=0;
+		 }
+
+	 StringGrid1->RowCount = m+2;
+	 StringGrid1->ColCount = n+2;
+	 for(i=0;i<m+2;i++){
+		 for(j=0;j<n+2;j++){
+			 StringGrid1->Cells[j][i] = IntToStr(B[i][j]);
+		 }
+	 } */
+	 int i,j;
+	 /*if(A){
+		for(i=0;i<m;i++) delete A[i];
+		delete A;
+	 }              */
+	 AnsiString out;
+	 m = StrToInt(Edit1->Text);
+	 n = StrToInt(Edit2->Text);
+
+	 A = new int * [m];
+	 for(i=0;i<m;i++) A[i] = new int [n];
+	 int start_i=1,start_j=1,end_i=m-2,end_j=n-2;
+	 int x,y;
+	 for(i=0;i<m;i++)
+		 for(j=0;j<n;j++){
+			 if(j==0||j==n-1) A[i][j]=2;
+			 else if(i==0||i==m-1) A[i][j]=2;
+			 else A[i][j]=1;
+		 }
+	 StringGrid3->RowCount = m;
+	 StringGrid3->ColCount = n;
+	 for(i=0;i<m;i++)
+		 for(j=0;j<n;j++)
+			 StringGrid3->Cells[j][i] = A[i][j];
+	 for(i=0;i<m;i++){
+			out="";
+			for(j=0;j<n;j++){
+				out += "  "+IntToStr(A[i][j]);
+			}
+			Memo3->Lines->Add(out);
+		}
+
+	 A = generatemaze(A,end_i,end_j);
+	 A[start_i][start_j-1]=0;
+	 A[end_i][end_j+1]=0;
+	 StringGrid3->RowCount = m;
+	 StringGrid3->ColCount = n;
+	 for(i=0;i<m;i++)
+		 for(j=0;j<n;j++)
+			 StringGrid3->Cells[j][i] = A[i][j];
+	 for(i=0;i<m;i++){
+			out="";
+			for(j=0;j<n;j++){
+				out += "  "+IntToStr(A[i][j]);
+			}
+			Memo3->Lines->Add(out);
+		}
+}
+
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::Button3Click(TObject *Sender)
+{
+     FILE *fp;
+	 AnsiString out,fname;
+	 int i,j;
+	 if(OpenDialog1->Execute()){
+		fname =OpenDialog1->FileName;
+		fp = fopen(fname.c_str(),"r+");
+		fscanf(fp,"%d %d",&m,&n);
+		endi=m,endj=n;
+		Memo1->Lines->Add("m = "+IntToStr(m));
+		Memo1->Lines->Add("n = "+IntToStr(n));
+		for(i=1;i<=m;i++)
+			for(j=1;j<=n;j++){
+				fscanf(fp,"%d",&maze[i][j]);
+				mark[i][j]=maze[i][j];
+			}
+		StringGrid1->RowCount = m;
+		StringGrid1->ColCount = n;
+		Memo1->Lines->Add("----------Maze-----------");
+		for(i=1;i<=m;i++){
+			out="";
+			for(j=1;j<=n;j++){
+				out += "  "+IntToStr(maze[i][j]);
+			}
+			Memo1->Lines->Add(out);
+		}
+		for(i=1;i<=m;i++){
+			for(j=1;j<=n;j++){
+				StringGrid1->Cells[j-1][i-1] = maze[i][j];
+			}
+		}
+	 }
+	 else Memo1->Lines->Add("Nothing Happens!");
+}
+//---------------------------------------------------------------------------
+
+
+void __fastcall TForm1::StringGrid1DrawCell(TObject *Sender, int ACol, int ARow, TRect &Rect,
+          TGridDrawState State)
+{
+	AnsiString text = StringGrid1->Cells[ACol][ARow];
+	if (text == "0")
+		StringGrid1->Canvas->Brush->Color = TColor RGB(228, 216, 220);
+	else if(text == "1")
+		StringGrid1->Canvas->Brush->Color = TColor RGB(201, 204, 213);
+	else if(text == "2")
+		StringGrid1->Canvas->Brush->Color = TColor RGB(147, 181, 198);
+	else if(text == "3")
+		StringGrid1->Canvas->Brush->Color = TColor RGB(255, 227, 227);
+		StringGrid1->Canvas->FillRect(Rect);
+		StringGrid1->Canvas->TextRect(Rect, Rect.Left+6, Rect.Top+8, text);
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::Button6Click(TObject *Sender)
+{
+	 int i,j;
+	 AnsiString out;
+	 if(visit(starti,startj)==0){
+		Memo1->Lines->Add("no exit");
+	 }
+	 else{
+		Memo1->Lines->Add("----------Mark-----------");
+		mark[m-1][n]=3;
+		for(i=1;i<=m;i++){
+			out="";
+			for(j=1;j<=n;j++){
+				out += "  "+IntToStr(mark[i][j]);
+			}
+			Memo1->Lines->Add(out);
+		}
+		for(i=1;i<=m;i++){
+			for(j=1;j<=n;j++){
+				StringGrid1->Cells[j-1][i-1] = mark[i][j];
+			}
+		}
+	 }
+}
+//---------------------------------------------------------------------------
+void __fastcall TForm1::Button2Click(TObject *Sender)
+{
+	 if(SaveDialog1->Execute()){
+		Memo1->Lines->SaveToFile(SaveDialog1->FileName);
+	 }
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TForm1::Button7Click(TObject *Sender)
+{
+	 m = StrToInt(Edit1->Text);
+	 n = StrToInt(Edit2->Text);
+	 Stack = new struct position[m*n];
+	 struct position step;
+	 AnsiString out;
+	 w = new int * [m];
+	 for(i=0;i<m;i++) w[i] = new int [n];
+	 for(i=0;i<m;i++)
+		 for(j=0;j<n;j++){
+			 if(j==0||j==n-1) w[i][j]=2;
+			 else if(i==0||i==m-1) w[i][j]=2;
+			 else w[i][j]=1;
+		 }
+	 step.x = 0;step.y = 0; d = step.dir;
+	 push(step);
+	 w[step.x][step.y]=0;
+	 while(top!=-1){
+		step = pop();
+		while(NextMove(step)){
+		  d = rand()%S;
+		  next.x = step.x+f2[d].dx;
+		  next.y = step.y+f2[d].dy;
+		  if(w[next.x][next.y]==-1){
+			w[step.x+f1[d].dx][step.y+f1[d].dy] = 0;
+			push(next);
+			w[next.x][next.y] = 0;
+			step = next;
+		  }
+		}
+	 }
+
+
+
+}
+//---------------------------------------------------------------------------
+
